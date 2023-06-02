@@ -1,0 +1,1 @@
+migrate -source file://pkg/database/migrations -database postgres://postgres:passwordq@db-standalone-postgresql-1:5432/template?sslmode=disable up

@@ -1,0 +1,224 @@
+basePath: /api/v1
+definitions:
+  http.RoleResponse:
+    properties:
+      data:
+        $ref: '#/definitions/sqlc.Role'
+      message:
+        type: string
+      success:
+        type: boolean
+    type: object
+  http.ValidationRole:
+    properties:
+      name:
+        type: string
+    required:
+    - name
+    type: object
+  pgtype.InfinityModifier:
+    enum:
+    - 1
+    - 0
+    - -1
+    type: integer
+    x-enum-varnames:
+    - Infinity
+    - Finite
+    - NegativeInfinity
+  pgtype.Timestamp:
+    properties:
+      infinityModifier:
+        $ref: '#/definitions/pgtype.InfinityModifier'
+      time:
+        description: Time zone will be ignored when encoding to PostgreSQL.
+        type: string
+      valid:
+        type: boolean
+    type: object
+  response.InternalServer:
+    properties:
+      message:
+        type: string
+      success:
+        type: boolean
+    type: object
+  response.LinkPaginationResponse:
+    properties:
+      first:
+        type: string
+      last:
+        type: string
+      next:
+        type: string
+      prev:
+        type: string
+    type: object
+  response.MetaResponse:
+    properties:
+      current_page:
+        type: integer
+      from:
+        type: integer
+      last_page:
+        type: integer
+      per_page:
+        type: integer
+      to:
+        type: integer
+      total:
+        type: integer
+    type: object
+  response.Notfound:
+    properties:
+      message:
+        type: string
+      success:
+        type: boolean
+    type: object
+  response.PaginationResponse:
+    properties:
+      data: {}
+      links:
+        $ref: '#/definitions/response.LinkPaginationResponse'
+      message:
+        type: string
+      meta:
+        $ref: '#/definitions/response.MetaResponse'
+      success:
+        type: boolean
+    type: object
+  response.SuccessResponse:
+    properties:
+      message:
+        type: string
+      success:
+        type: boolean
+    type: object
+  sqlc.Role:
+    properties:
+      createdAt:
+        $ref: '#/definitions/pgtype.Timestamp'
+      id:
+        type: integer
+      name:
+        type: string
+      updatedAt:
+        $ref: '#/definitions/pgtype.Timestamp'
+    type: object
+host: localhost:3000
+info:
+  contact:
+    email: support@swagger.io
+    name: API Support
+    url: http://www.swagger.io/support
+  description: API Docs Clean Arch Template
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: Clean Arch template
+  version: "1.0"
+paths:
+  /roles:
+    get:
+      consumes:
+      - application/json
+      description: Get all roles
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.PaginationResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.InternalServer'
+      summary: Get all roles
+      tags:
+      - roles
+    post:
+      consumes:
+      - application/json
+      description: Create roles
+      parameters:
+      - description: Role Name
+        in: body
+        name: name
+        required: true
+        schema:
+          $ref: '#/definitions/http.ValidationRole'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/http.RoleResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.InternalServer'
+      summary: Create roles
+      tags:
+      - roles
+  /roles/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete role
+      parameters:
+      - description: Role ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.SuccessResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.Notfound'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.InternalServer'
+      summary: Delete role
+      tags:
+      - roles
+    get:
+      consumes:
+      - application/json
+      description: Get role
+      parameters:
+      - description: Role ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/http.RoleResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.Notfound'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.InternalServer'
+      summary: Get role
+      tags:
+      - roles
+swagger: "2.0"

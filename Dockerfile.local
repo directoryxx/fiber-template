@@ -1,0 +1,28 @@
+FROM golang:1.20 as builder
+LABEL authors="directoryx"
+
+ENV GOBIN $GOPATH/bin
+
+RUN mkdir /app
+
+RUN apt update && apt install -y bash ca-certificates git gcc g++ libc-dev librdkafka-dev pkgconf
+
+COPY . /app
+
+WORKDIR /app
+
+RUN CGO_ENABLED=1 go build -tags musl -o ./build/app ./cmd/app
+
+RUN go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
+
+RUN go install github.com/cosmtrek/air@latest
+
+RUN go install github.com/kyleconroy/sqlc/cmd/sqlc@latest
+
+RUN go install github.com/swaggo/swag/cmd/swag@latest
+
+# RUN go install github.com/kyleconroy/sqlc/cmd/sqlc@latest
+
+RUN chmod +x /app/build/app
+
+CMD ["air"]
