@@ -1,12 +1,9 @@
 package http
 
 import (
-	logger2 "clean-arch-template/pkg/logger"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/swagger"
 )
-
-var logger = logger2.NewLogger()
 
 // Handlers represents the collection of HTTP handler functions.
 type Handlers struct {
@@ -32,6 +29,10 @@ func NewRouter(app *fiber.App, handlers *Handlers) *Router {
 
 // SetupRoutes sets up the application routes.
 func (r *Router) SetupRoutes() {
+
+	r.Router.Get("/ping", func(ctx *fiber.Ctx) error {
+		return ctx.SendString("pong")
+	})
 
 	/**
 	Swagger Route

@@ -4,7 +4,7 @@ Copyright © 2023 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
-	"clean-arch-template/pkg/helper"
+	"clean-arch-template/pkg/utils"
 	"fmt"
 	"github.com/spf13/cobra"
 	"log"
@@ -149,7 +149,7 @@ func (r *%[2]sRepository) PaginationList%[1]s(ctx context.Context, limit int, of
 	return &list%[1]s, err
 }
 
-		`, helper.CapitalizeWord(feat), feat)
+		`, utils.CapitalizeWord(feat), feat)
 
 	f, err := os.Create("./internal/repository/" + feat + ".repository.go")
 
@@ -175,7 +175,7 @@ func generateUsecase(feat string) {
 import (
 	"clean-arch-template/internal/repository"
 	"clean-arch-template/pkg/database/sqlc"
-	"clean-arch-template/pkg/helper"
+	"clean-arch-template/pkg/utils"
 	"context"
 )
 
@@ -228,8 +228,8 @@ func (s *%[2]sUsecase) List%[1]s(ctx context.Context) (*[]sqlc.%[1]s, error) {
 }
 
 func (s *%[2]sUsecase) List%[1]sPagination(ctx context.Context, page int, page_size int) (%[2]s *[]sqlc.%[1]s, count int32, err error) {
-	offsetCalculate := helper.OffsetCalculator(page, page_size)
-	limitCalculate := helper.LimitCalculator(page, page_size)
+	offsetCalculate := utils.OffsetCalculator(page, page_size)
+	limitCalculate := utils.LimitCalculator(page, page_size)
 	u, err := s.%[2]sRepo.PaginationList%[1]s(ctx, limitCalculate, offsetCalculate)
 	count%[1]s, errCount := s.%[2]sRepo.CountAll%[1]s(ctx)
 	if errCount != nil {
@@ -258,7 +258,7 @@ func (s *%[2]sUsecase) Delete%[1]s(ctx context.Context, id string) (err error) {
 	}
 	return nil
 }
-`, helper.CapitalizeWord(feat), feat)
+`, utils.CapitalizeWord(feat), feat)
 	f, err := os.Create("./internal/usecase/" + feat + ".usecase.go")
 
 	if err != nil {
@@ -282,7 +282,7 @@ func generateHandler(feat string) {
 import (
 	"clean-arch-template/internal/usecase"
 	"clean-arch-template/pkg/database/sqlc"
-	"clean-arch-template/pkg/helper"
+	"clean-arch-template/pkg/utils"
 	"clean-arch-template/pkg/response"
 	"clean-arch-template/pkg/validation"
 	"github.com/gofiber/fiber/v2"
@@ -426,7 +426,7 @@ func (h *%[1]sHandler) List%[1]ss(ec *fiber.Ctx) error {
 		})
 	}
 
-	return ec.JSON(helper.GeneratorPaginationResponse(%[2]ss, int(count), currentPageInt, perPage, baseUrl))
+	return ec.JSON(utils.GeneratorPaginationResponse(%[2]ss, int(count), currentPageInt, perPage, baseUrl))
 }
 
 // Create%[1]s is a function to create %[2]ss data
@@ -469,7 +469,7 @@ func (h *%[1]sHandler) Create%[1]s(ec *fiber.Ctx) error {
 		Message: "Berhasil membuat %[2]s",
 		Data:    %[2]sModel,
 	})
-}`, helper.CapitalizeWord(feat), feat)
+}`, utils.CapitalizeWord(feat), feat)
 	f, err := os.Create("./internal/delivery/http/" + feat + ".handler.go")
 
 	if err != nil {

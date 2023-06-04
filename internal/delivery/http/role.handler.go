@@ -3,8 +3,8 @@ package http
 import (
 	"clean-arch-template/internal/usecase"
 	"clean-arch-template/pkg/database/sqlc"
-	"clean-arch-template/pkg/helper"
 	"clean-arch-template/pkg/response"
+	"clean-arch-template/pkg/utils"
 	"clean-arch-template/pkg/validation"
 	"github.com/gofiber/fiber/v2"
 	"strconv"
@@ -41,7 +41,7 @@ func (h *RoleHandler) GetRole(ec *fiber.Ctx) error {
 	id := ec.Params("id")
 	role, err := h.RoleUsecase.GetRoleByID(ec.UserContext(), id)
 	if err != nil {
-		logger.Error(err.Error())
+		newLogger.Error(err.Error())
 		ec.Status(fiber.StatusInternalServerError)
 		return ec.JSON(&response.InternalServer{
 			Message: "Internal Server Error",
@@ -77,7 +77,7 @@ func (h *RoleHandler) DeleteRole(ec *fiber.Ctx) error {
 	id := ec.Params("id")
 	role, err := h.RoleUsecase.GetRoleByID(ec.UserContext(), id)
 	if err != nil {
-		logger.Error(err.Error())
+		newLogger.Error(err.Error())
 		ec.Status(fiber.StatusInternalServerError)
 		return ec.JSON(&response.InternalServer{
 			Message: "Internal Server Error",
@@ -95,7 +95,7 @@ func (h *RoleHandler) DeleteRole(ec *fiber.Ctx) error {
 	errUsecase := h.RoleUsecase.DeleteRole(ec.UserContext(), id)
 
 	if errUsecase != nil {
-		logger.Error(errUsecase.Error())
+		newLogger.Error(errUsecase.Error())
 		ec.Status(fiber.StatusInternalServerError)
 		return ec.JSON(&response.InternalServer{
 			Success: false,
@@ -137,7 +137,7 @@ func (h *RoleHandler) ListRoles(ec *fiber.Ctx) error {
 	Checking error related to usecase
 	*/
 	if err != nil {
-		logger.Error(err.Error())
+		newLogger.Error(err.Error())
 		ec.Status(fiber.StatusInternalServerError)
 		return ec.JSON(&response.InternalServer{
 			Success: false,
@@ -145,7 +145,7 @@ func (h *RoleHandler) ListRoles(ec *fiber.Ctx) error {
 		})
 	}
 
-	return ec.JSON(helper.GeneratorPaginationResponse(roles, int(count), currentPageInt, perPage, baseUrl))
+	return ec.JSON(utils.GeneratorPaginationResponse(roles, int(count), currentPageInt, perPage, baseUrl))
 }
 
 // CreateRole is a function to create roles data
@@ -162,7 +162,7 @@ func (h *RoleHandler) CreateRole(ec *fiber.Ctx) error {
 	var role ValidationRole
 	err := ec.BodyParser(&role)
 	if err != nil {
-		logger.Error(err.Error())
+		newLogger.Error(err.Error())
 		ec.Status(fiber.StatusInternalServerError)
 		return ec.JSON(&response.InternalServer{
 			Message: err.Error(),
@@ -176,13 +176,14 @@ func (h *RoleHandler) CreateRole(ec *fiber.Ctx) error {
 
 	roleModel, err := h.RoleUsecase.CreateRole(ec.UserContext(), role.Name)
 	if err != nil {
-		logger.Error(err.Error())
+		newLogger.Error(err.Error())
 		ec.Status(fiber.StatusInternalServerError)
 		return ec.JSON(&response.InternalServer{
 			Message: err.Error(),
 		})
 	}
 
+	ec.Status(fiber.StatusCreated)
 	return ec.JSON(&RoleResponse{
 		Success: true,
 		Message: "Berhasil membuat role",

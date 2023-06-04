@@ -3,7 +3,7 @@ package usecase
 import (
 	"clean-arch-template/internal/repository"
 	"clean-arch-template/pkg/database/sqlc"
-	"clean-arch-template/pkg/helper"
+	"clean-arch-template/pkg/utils"
 	"context"
 )
 
@@ -56,8 +56,8 @@ func (s *roleUsecase) ListRole(ctx context.Context) (*[]sqlc.Role, error) {
 }
 
 func (s *roleUsecase) ListRolePagination(ctx context.Context, page int, page_size int) (role *[]sqlc.Role, count int32, err error) {
-	offsetCalculate := helper.OffsetCalculator(page, page_size)
-	limitCalculate := helper.LimitCalculator(page, page_size)
+	offsetCalculate := utils.OffsetCalculator(page, page_size)
+	limitCalculate := utils.LimitCalculator(page, page_size)
 	u, err := s.roleRepo.PaginationListRole(ctx, limitCalculate, offsetCalculate)
 	countRole, errCount := s.roleRepo.CountAllRole(ctx)
 	if errCount != nil {
