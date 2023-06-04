@@ -25,7 +25,9 @@ func NewLogger() *Logger {
 
 // Info logs an informational message.
 func (l *Logger) Info(message string) {
-	l.logger.Info().Msg(message)
+	if os.Getenv("TEST_MODE") != "true" {
+		l.logger.Info().Msg(message)
+	}
 }
 
 // Error logs an error message.
