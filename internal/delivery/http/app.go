@@ -42,11 +42,6 @@ func Run() *fiber.App {
 		TracesSampleRate: 1.0,
 	})
 
-	//sentry.CaptureException(errors.New("my error"))
-	//// Since sentry emits events in the background we need to make sure
-	//// they are sent before we shut down
-	//sentry.Flush(time.Second * 5)
-
 	/**
 	Load Infrastructure
 	*/
