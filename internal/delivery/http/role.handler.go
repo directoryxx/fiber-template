@@ -39,6 +39,9 @@ func NewRoleHandler(roleUsecase usecase.RoleUsecase) *RoleHandler {
 // @Failure 500 {object} response.InternalServer{}
 // @Router /roles/{id} [get]
 func (h *RoleHandler) GetRole(ec *fiber.Ctx) error {
+	span := sentry.StartSpan(ec.UserContext(), "handler",
+		sentry.WithTransactionName(ec.Method()+" "+ec.OriginalURL()))
+	defer span.Finish()
 	id := ec.Params("id")
 	role, err := h.RoleUsecase.GetRoleByID(ec.UserContext(), id)
 	if err != nil {
@@ -75,6 +78,9 @@ func (h *RoleHandler) GetRole(ec *fiber.Ctx) error {
 // @Failure 500 {object} response.InternalServer{}
 // @Router /roles/{id} [delete]
 func (h *RoleHandler) DeleteRole(ec *fiber.Ctx) error {
+	span := sentry.StartSpan(ec.UserContext(), "handler",
+		sentry.WithTransactionName(ec.Method()+" "+ec.OriginalURL()))
+	defer span.Finish()
 	id := ec.Params("id")
 	role, err := h.RoleUsecase.GetRoleByID(ec.UserContext(), id)
 	if err != nil {
@@ -165,6 +171,9 @@ func (h *RoleHandler) ListRoles(ec *fiber.Ctx) error {
 // @Failure 500 {object} response.InternalServer{}
 // @Router /roles [post]
 func (h *RoleHandler) CreateRole(ec *fiber.Ctx) error {
+	span := sentry.StartSpan(ec.UserContext(), "handler",
+		sentry.WithTransactionName(ec.Method()+" "+ec.OriginalURL()))
+	defer span.Finish()
 	var role ValidationRole
 	err := ec.BodyParser(&role)
 	if err != nil {
