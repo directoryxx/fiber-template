@@ -7,8 +7,18 @@ import (
 	"clean-arch-template/pkg/database/sqlc"
 	"clean-arch-template/pkg/infrastructure"
 	"clean-arch-template/pkg/logger"
+	"github.com/getsentry/sentry-go"
+	"github.com/gofiber/contrib/fibersentry"
 	"github.com/gofiber/fiber/v2"
+	"github.com/valyala/fasthttp"
+	"os"
 )
+
+type ContextData struct {
+	// Store information for custom TracesSampler.
+	request *fasthttp.Request
+	// ...
+}
 
 var newLogger = logger.NewLogger()
 
@@ -18,6 +28,24 @@ func Run() *fiber.App {
 	*/
 	envSource := config.LoadConfig()
 	newLogger.Info("Loaded Config : " + envSource)
+
+	/**
+	Init Sentry
+	*/
+	_ = sentry.Init(sentry.ClientOptions{
+		Dsn:              os.Getenv("SENTRY_URI_DSN"),
+		Debug:            true,
+		AttachStacktrace: true,
+		EnableTracing:    true,
+		// Specify a fixed sample rate:
+		// We recommend adjusting this value in production
+		TracesSampleRate: 1.0,
+	})
+
+	//sentry.CaptureException(errors.New("my error"))
+	//// Since sentry emits events in the background we need to make sure
+	//// they are sent before we shut down
+	//sentry.Flush(time.Second * 5)
 
 	/**
 	Load Infrastructure
@@ -43,6 +71,14 @@ func Run() *fiber.App {
 		ServerHeader: "App",
 		AppName:      "Clean Arch Template v0.0.1",
 	})
+
+	/**
+	Implement Sentry to middleware
+	*/
+	app.Use(fibersentry.New(fibersentry.Config{
+		Repanic:         true,
+		WaitForDelivery: true,
+	}))
 
 	/**
 	Pprof

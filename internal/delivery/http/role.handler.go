@@ -6,6 +6,7 @@ import (
 	"clean-arch-template/pkg/response"
 	"clean-arch-template/pkg/utils"
 	"clean-arch-template/pkg/validation"
+	"github.com/getsentry/sentry-go"
 	"github.com/gofiber/fiber/v2"
 	"strconv"
 )
@@ -119,6 +120,9 @@ func (h *RoleHandler) DeleteRole(ec *fiber.Ctx) error {
 // @Failure 500 {object} response.InternalServer{}
 // @Router /roles [get]
 func (h *RoleHandler) ListRoles(ec *fiber.Ctx) error {
+	span := sentry.StartSpan(ec.UserContext(), "handler",
+		sentry.WithTransactionName(ec.Method()+" "+ec.OriginalURL()))
+
 	perPage := 15
 	currentPage := ec.Query("page")
 	currentPageInt, errPage := strconv.Atoi(currentPage)
@@ -132,6 +136,8 @@ func (h *RoleHandler) ListRoles(ec *fiber.Ctx) error {
 	}
 
 	roles, count, err := h.RoleUsecase.ListRolePagination(ec.UserContext(), currentPageInt, perPage)
+
+	span.Finish()
 
 	/**
 	Checking error related to usecase
