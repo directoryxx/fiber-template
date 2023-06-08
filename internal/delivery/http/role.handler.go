@@ -8,6 +8,8 @@ import (
 	"clean-arch-template/pkg/validation"
 	"github.com/getsentry/sentry-go"
 	"github.com/gofiber/fiber/v2"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/trace"
 	"strconv"
 )
 
@@ -171,9 +173,11 @@ func (h *RoleHandler) ListRoles(ec *fiber.Ctx) error {
 // @Failure 500 {object} response.InternalServer{}
 // @Router /roles [post]
 func (h *RoleHandler) CreateRole(ec *fiber.Ctx) error {
-	span := sentry.StartSpan(ec.UserContext(), "handler",
-		sentry.WithTransactionName(ec.Method()+" "+ec.OriginalURL()))
-	defer span.Finish()
+	span := trace.SpanFromContext(ec.UserContext())
+	span.SetAttributes(attribute.String("controller", "books"))
+	//span := sentry.StartSpan(ec.UserContext(), "handler",
+	//	sentry.WithTransactionName(ec.Method()+" "+ec.OriginalURL()))
+	//defer span.Finish()
 	var role ValidationRole
 	err := ec.BodyParser(&role)
 	if err != nil {
